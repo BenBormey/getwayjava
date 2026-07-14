@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            # auth-service: login/refresh/logout, admin user & role management, /api/me
+            - id: auth-service
+              uri: http://localhost:8085
+              predicates:
+                - Path=/api/auth/**,/api/users/**,/api/roles/**,/api/permissions/**,/api/me
+
+            # operation-service: everything else under /api/** that isn't auth or reports
+            - id: operation-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/categories/**,/api/collections/**,/api/customer-checkins/**,/api/customers/**,/api/deliveries/**,/api/driver-assignments/**,/api/driver/**,/api/invoices/**,/api/products/**,/api/route-plans/**,/api/sales-orders/**,/api/sds/**,/api/stocks/**,/api/stock-ledgers/**,/api/suppliers/**,/api/transfer-orders/**,/api/vehicles/**,/api/warehouse-stocks/**
+
+            # report-service
+            - id: report-service
+              uri: http://localhost:8091
+              predicates:
+                - Path=/api/reports/**
+
+            # cron-service (Service_4, middleware): scheduled daily-summary job
+            - id: cron-service
+              uri: http://localhost:8087
+              predicates:
+                - Path=/api/cron/**
+
+server:
+  port: 8080
